@@ -3,14 +3,17 @@ from tkinter import filedialog
 from lista_maquetas import ListaMaquetas
 from archivo import leer_archivo_xml
 import graphviz
+import os
 
 class VentanaPrincipal:
     def __init__(self, ventana):
         self.ventana = ventana
         self.ventana.title("Menú Principal")
         self.ventana.configure(bg="#B4D4FF") 
-        self.ventana.geometry("400x290")
+        self.ventana.geometry("400x400")
         self.lista_maquetas = ListaMaquetas()
+        self.directorio_proyecto = os.getcwd()
+        self.archivo_leido = False
         self.crear_interfaz()
 
     def crear_interfaz(self):
@@ -18,60 +21,56 @@ class VentanaPrincipal:
         self.label_bienvenido = tk.Label(self.ventana, text="Bienvenido", bg="#B4D4FF", font=("Verdana", 20))
         self.label_bienvenido.pack(pady=20)
 
-        # Label de Subir archivo
-        self.label_archivo = tk.Label(self.ventana, text="Para resolver maquetas\ndebes abrir el archivo XML primero", bg="#B4D4FF", font=("Verdana", 12))
-        self.label_archivo.pack(pady=10)
+        # Botón para abrir archivo
+        self.boton_abrir = tk.Button(self.ventana, text="Abrir archivo", command=self.abrir_archivo, width=15)
+        self.boton_abrir.pack(pady=10)
 
-        # Contenedor para los botones
-        self.frame_botones = tk.Frame(self.ventana, bg="#B4D4FF")
-        self.frame_botones.pack(pady=10)
+        # Label para archivo leído correctamente
+        self.label_archivo_leido = tk.Label(self.ventana, text="", bg="#B4D4FF", font=("Verdana", 12))
+        self.label_archivo_leido.pack(pady=10)
 
-        # Botones
-        self.boton_abrir = tk.Button(self.frame_botones, text="Abrir archivo", command=self.abrir_archivo, width=15)
-        self.boton_abrir.pack(side=tk.LEFT, padx=10)
+        # Label para gestionar maquetas
+        self.label_gestion_maquetas = tk.Label(self.ventana, text="Gestionar Maquetas", bg="#B4D4FF", font=("Verdana", 12))
+        self.label_gestion_maquetas.pack(pady=10)
 
-        self.boton_salir = tk.Button(self.frame_botones, text="Salir", command=self.salir, width=15)
-        self.boton_salir.pack(side=tk.LEFT, padx=10)
+        # Selector de opciones
+        self.selector_opciones = tk.StringVar()
+        self.selector_opciones.set("Seleccionar") 
+        opciones = ["Ver gráficamente", "Ver listado"]
+        self.menu_selector = tk.OptionMenu(self.ventana, self.selector_opciones, *opciones, command=self.gestionar_maquetas)
+        self.menu_selector.config(width=15)
+        self.menu_selector.pack(pady=5)
+
+        # Botón de ayuda
+        self.boton_ayuda = tk.Button(self.ventana, text="Ayuda", command=self.mostrar_ayuda, width=15)
+        self.boton_ayuda.pack(pady=10)
+
+        # Botón para salir
+        self.boton_salir = tk.Button(self.ventana, text="Salir", command=self.salir, width=15)
+        self.boton_salir.pack(pady=10)
 
     def abrir_archivo(self):
         archivo = filedialog.askopenfilename(filetypes=[("Archivo XML", "*.xml")])
         if archivo:  # Se verifica si se seleccionó un archivo
             self.lista_maquetas = leer_archivo_xml(archivo)
+            self.lista_maquetas.ordenar_alfabeticamente()  # Ordenar las maquetas alfabéticamente
             self.archivo_leido_correctamente()
 
     def archivo_leido_correctamente(self):
         # Función para mostrar el mensaje de archivo leído correctamente
-        self.label_archivo_leido = tk.Label(self.ventana, text="Archivo leído correctamente", bg="#B4D4FF", font=("Verdana", 12))
-        self.label_archivo_leido.pack(pady=10)
-        self.boton_gestionar = tk.Button(self.frame_botones, text="Gestionar Maquetas", command=self.gestionar_maquetas, width=15)
-        self.boton_gestionar.pack(side=tk.LEFT, padx=10)
+        self.label_archivo_leido.config(text="Archivo leído correctamente")
+        self.archivo_leido = True
 
-        #pasar las maquetas en orden alfabetico
-        self.lista_maquetas.ordenar_alfabeticamente()
-    def gestionar_maquetas(self):
-        # Función para abrir la ventana de gestión de maquetas
-        if self.lista_maquetas:
-            ventana_gestion_maquetas = tk.Toplevel(self.ventana)
-            ventana_gestion_maquetas.title("Gestionar Maquetas")
-            ventana_gestion_maquetas.configure(bg="#B4D4FF")
-            ventana_gestion_maquetas.geometry("300x210")
+    def gestionar_maquetas(self, event=None):
+        if not self.archivo_leido:
+            tk.messagebox.showwarning("Error", "No se ha ingresado ningún archivo.")
+            return
 
-            # Contenedor para organizar elementos
-            frame_contenedor = tk.Frame(ventana_gestion_maquetas, bg="#B4D4FF")
-            frame_contenedor.pack(pady=10)
-
-            # Labels
-            label_gestionMaquetas = tk.Label(frame_contenedor, text="Selecciona la acción que \n deseas realizar", bg="#B4D4FF", font=("Verdana", 16))
-            label_gestionMaquetas.pack(anchor="w", padx=10)
-
-            # Botones
-            boton_listado = tk.Button(frame_contenedor, text="Ver listado", command=self.ver_maquetas, width=20)
-            boton_listado.pack(side=tk.RIGHT, padx=10, pady=5)
-            boton_ver_maquetas = tk.Button(frame_contenedor, text="Ver graficamente", command=self.ver_graficamente, width=20)
-            boton_ver_maquetas.pack(side=tk.RIGHT, padx=10, pady=5)
-
-        else:
-            print("No se ha cargado ninguna maqueta.")       
+        opcion = self.selector_opciones.get()
+        if opcion == "Ver gráficamente":
+            self.ver_graficamente()
+        elif opcion == "Ver listado":
+            self.ver_maquetas()
 
     def ver_maquetas(self):
         ventana_listado_maquetas = tk.Toplevel(self.ventana)
@@ -90,12 +89,18 @@ class VentanaPrincipal:
             text_area.insert(tk.END, f"Columnas: {maq.columnas}\n")
             text_area.insert(tk.END, f"Entrada: {maq.entrada}\n")
             text_area.insert(tk.END, "Objetivos:\n")
-            objetivo_actual = maq.objetivos_cabeza
+            objetivo_actual = maq.primer_objetivo  # Comenzar desde el primer objetivo
             while objetivo_actual:
                 text_area.insert(tk.END, f"  Nombre: {objetivo_actual.nombre}, Fila: {objetivo_actual.fila}, Columna: {objetivo_actual.columna}\n")
-                objetivo_actual = objetivo_actual.siguiente
+                objetivo_actual = objetivo_actual.siguiente  # Avanzar al siguiente objetivo
             text_area.insert(tk.END, f"Estructura: {maq.estructura}\n\n")
             nodo_actual = nodo_actual.siguiente
+
+    def ver_graficamente(self):
+        pass
+
+    def mostrar_ayuda(self):
+        pass
 
     def salir(self):
         self.ventana.quit()
