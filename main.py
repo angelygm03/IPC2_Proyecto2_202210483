@@ -135,10 +135,14 @@ class VentanaPrincipal:
         for i in range(R):
             table += "<TR>"
             for j in range(C):
-                color = '#FFFFFF' if patron_data[i * C + j] == '-' else '#000000'
-                table += f'<TD WIDTH="{cell_width}px" HEIGHT="{cell_height}px" BGCOLOR="{color}" BORDER="0"></TD>'
+                if i * C + j < len(patron_data):  # Comprobación de rango válido
+                    color = '#FFFFFF' if patron_data[i * C + j] == '-' else '#000000'
+                    table += f'<TD WIDTH="{cell_width}" HEIGHT="{cell_height}" BGCOLOR="{color}" BORDER="0"></TD>'
+                else:
+                    table += '<TD WIDTH="{cell_width}" HEIGHT="{cell_height}" BGCOLOR="#FFFFFF" BORDER="0"></TD>'
             table += "</TR>"
         return table
+
 
     def ver_graficamente(self):
         cell_width = 30  # Ancho de celda 
@@ -150,8 +154,14 @@ class VentanaPrincipal:
             R, C = maqueta.filas, maqueta.columnas
             dot = Digraph(comment='Patrón')
             dot.node('tab', label=f'<<TABLE>{self.generate_table(patron_data, R, C, cell_width, cell_height)}</TABLE>>', shape='none')
-            dot.render(f'{maqueta.nombre}_patron', format='png', cleanup=True)
-            print(f"El patrón de la maqueta {maqueta.nombre} se ha mostrado gráficamente.")
+            # Crear directorio si no existe
+            directorio_imagenes = os.path.join(self.directorio_proyecto, 'imagenes_maquetas')
+            if not os.path.exists(directorio_imagenes):
+                os.makedirs(directorio_imagenes)
+            # Guardar imagen en el directorio
+            imagen_nombre = f'{maqueta.nombre}_patron'
+            dot.render(os.path.join(directorio_imagenes, imagen_nombre), format='png', cleanup=True)
+            print(f"El patrón de la maqueta {maqueta.nombre} se ha guardado en la carpeta 'imagenes_maquetas'.")
             maqueta_actual = maqueta_actual.siguiente
 
     def mostrar_ayuda(self):
