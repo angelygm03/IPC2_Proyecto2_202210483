@@ -1,9 +1,11 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from lista_maquetas import ListaMaquetas
 from archivo import leer_archivo_xml
-import graphviz
+from graphviz import Digraph
 import os
+from xml.etree import ElementTree as ET
+from maqueta import Maqueta
 
 class VentanaPrincipal:
     def __init__(self, ventana):
@@ -96,8 +98,52 @@ class VentanaPrincipal:
             text_area.insert(tk.END, f"Estructura: {maq.estructura}\n\n")
             nodo_actual = nodo_actual.siguiente
 
+    def parsear_archivo_xml(self, archivo):
+        lista_maquetas = ListaMaquetas()
+        tree = ET.parse(archivo)
+        root = tree.getroot()
+        for maqueta_xml in root.findall('maquetas/maqueta'):
+            nombre = maqueta_xml.find('nombre').text.strip()
+            filas = int(maqueta_xml.find('filas').text.strip())
+            columnas = int(maqueta_xml.find('columnas').text.strip())
+            entrada = (
+                int(maqueta_xml.find('entrada/fila').text.strip()),
+                int(maqueta_xml.find('entrada/columna').text.strip())
+            )
+            estructura = maqueta_xml.find('estructura').text.strip()
+            maqueta = Maqueta(nombre, filas, columnas, entrada, estructura)
+            objetivos_xml = maqueta_xml.find('objetivos')
+            for objetivo_xml in objetivos_xml.findall('objetivo'):
+                nombre_obj = objetivo_xml.find('nombre').text.strip()
+                fila_obj = int(objetivo_xml.find('fila').text.strip())
+                col_obj = int(objetivo_xml.find('columna').text.strip())
+                maqueta.agregar_objetivo(nombre_obj, fila_obj, col_obj)
+            lista_maquetas.agregar_maq(maqueta)
+        return lista_maquetas
+
+    def generate_table(self, patron_data, R, C, cell_width, cell_height):
+        table = ""
+        for i in range(R):
+            table += "<TR>"
+            for j in range(C):
+                color = '#FFFFFF' if patron_data[i * C + j] == '-' else '#000000'
+                table += f'<TD WIDTH="{cell_width}px" HEIGHT="{cell_height}px" BGCOLOR="{color}" BORDER="0"></TD>'
+            table += "</TR>"
+        return table
+
     def ver_graficamente(self):
-        pass
+        cell_width = 30  # Ancho de celda 
+        cell_height = 26  # Alto de celda 
+        maqueta_actual = self.lista_maquetas.cabeza
+        while maqueta_actual:
+            maqueta = maqueta_actual.maqueta
+            patron_data = maqueta.estructura.replace('*', 'B').replace('-', '-')
+            R, C = maqueta.filas, maqueta.columnas
+            dot = Digraph(comment='Patrón')
+            dot.node('tab', label=f'<<TABLE>{self.generate_table(patron_data, R, C, cell_width, cell_height)}</TABLE>>', shape='none')
+            dot.render(f'{maqueta.nombre}_patron', format='png', cleanup=True)
+            print(f"El patrón de la maqueta {maqueta.nombre} se ha mostrado gráficamente.")
+            maqueta_actual = maqueta_actual.siguiente
 
     def mostrar_ayuda(self):
         pass
