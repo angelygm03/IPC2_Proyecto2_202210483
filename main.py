@@ -47,6 +47,10 @@ class VentanaPrincipal:
         self.boton_ayuda = tk.Button(self.ventana, text="Ayuda", command=self.mostrar_ayuda, width=15)
         self.boton_ayuda.pack(pady=10)
 
+        # Botón cargar otro archivo
+        self.boton_cargar_otro = tk.Button(self.ventana, text="Cargar otro archivo", command=self.abrir_archivo, width=15)
+        self.boton_cargar_otro.pack(pady=10)
+
         # Botón para salir
         self.boton_salir = tk.Button(self.ventana, text="Salir", command=self.salir, width=15)
         self.boton_salir.pack(pady=10)
@@ -62,6 +66,11 @@ class VentanaPrincipal:
         # Función para mostrar el mensaje de archivo leído correctamente
         self.label_archivo_leido.config(text="Archivo leído correctamente")
         self.archivo_leido = True
+    
+    def mostrar_opcion_cargar_otro(self):
+        # Mostrar opción para cargar otro archivo
+        self.boton_cargar_otro = tk.Button(self.ventana, text="Cargar otro archivo", command=self.abrir_archivo, width=15)
+        self.boton_cargar_otro.pack(pady=10)
 
     def gestionar_maquetas(self, event=None):
         if not self.archivo_leido:
