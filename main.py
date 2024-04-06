@@ -130,18 +130,35 @@ class VentanaPrincipal:
             lista_maquetas.agregar_maq(maqueta)
         return lista_maquetas
 
-    def generate_table(self, patron_data, R, C, cell_width, cell_height):
+    def generate_table(self, maqueta, cell_width, cell_height):
         table = ""
+        estructura = maqueta.estructura
+        R, C = maqueta.filas, maqueta.columnas
+        entrada_fila, entrada_columna = maqueta.entrada
         for i in range(R):
             table += "<TR>"
             for j in range(C):
-                if i * C + j < len(patron_data):  # Comprobación de rango válido
-                    color = '#FFFFFF' if patron_data[i * C + j] == '-' else '#000000'
-                    table += f'<TD WIDTH="{cell_width}" HEIGHT="{cell_height}" BGCOLOR="{color}" BORDER="0"></TD>'
+                if i == entrada_fila and j == entrada_columna:  # Verificar si es la celda de entrada
+                    color = '#ADD8E6'  # Celeste para la celda de entrada
                 else:
-                    table += '<TD WIDTH="{cell_width}" HEIGHT="{cell_height}" BGCOLOR="#FFFFFF" BORDER="0"></TD>'
+                    color = '#FFFFFF' if estructura[i * C + j] == '-' else '#000000'
+                table += f'<TD WIDTH="{cell_width}" HEIGHT="{cell_height}" BGCOLOR="{color}" BORDER="0">'
+                # Verificar si hay un objetivo en esta celda
+                objetivo = self.buscar_objetivo(maqueta, i, j)
+                if objetivo:
+                    table += objetivo.nombre
+                table += "</TD>"
             table += "</TR>"
         return table
+
+    def buscar_objetivo(self, maqueta, fila, columna):
+        objetivo_actual = maqueta.primer_objetivo
+        while objetivo_actual:
+            if objetivo_actual.fila == fila and objetivo_actual.columna == columna:
+                return objetivo_actual
+            objetivo_actual = objetivo_actual.siguiente
+        return None
+
 
 
     def ver_graficamente(self):
@@ -150,10 +167,8 @@ class VentanaPrincipal:
         maqueta_actual = self.lista_maquetas.cabeza
         while maqueta_actual:
             maqueta = maqueta_actual.maqueta
-            patron_data = maqueta.estructura.replace('*', 'B').replace('-', '-')
-            R, C = maqueta.filas, maqueta.columnas
             dot = Digraph(comment='Patrón')
-            dot.node('tab', label=f'<<TABLE>{self.generate_table(patron_data, R, C, cell_width, cell_height)}</TABLE>>', shape='none')
+            dot.node('tab', label=f'<<TABLE>{self.generate_table(maqueta, cell_width, cell_height)}</TABLE>>', shape='none')
             # Crear directorio si no existe
             directorio_imagenes = os.path.join(self.directorio_proyecto, 'imagenes_maquetas')
             if not os.path.exists(directorio_imagenes):
