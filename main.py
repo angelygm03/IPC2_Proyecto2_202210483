@@ -165,7 +165,33 @@ class VentanaPrincipal:
             maqueta_actual = maqueta_actual.siguiente
 
     def mostrar_ayuda(self):
-        pass
+        # Ventana de Ayuda
+        ventana_ayuda = tk.Toplevel(self.ventana)
+        ventana_ayuda.title("Ayuda")
+        ventana_ayuda.geometry("480x240")
+        ventana_ayuda.configure(bg="#B4D4FF")
+        
+        # Datos personales
+        label_datos_personales = tk.Label(ventana_ayuda, text="Datos Personales", bg="#B4D4FF", font=("Verdana", 18))
+        label_datos_personales.pack(pady=5)
+        label_nombre = tk.Label(ventana_ayuda, text="Nombre: Angely Lucrecia García Martínez ", bg="#B4D4FF", font=("Verdana", 12))
+        label_nombre.pack()
+        label_correo = tk.Label(ventana_ayuda, text="Carné: 202210483", bg="#B4D4FF", font=("Verdana", 12))
+        label_correo.pack()
+        label_curso = tk.Label(ventana_ayuda, text="Curso: IPC2 Sección N \n", bg="#B4D4FF", font=("Verdana", 12))
+        label_curso.pack()
+
+        # Enlace a Drive
+        label_link = tk.Label(ventana_ayuda, text="Puedes consultar la documentación \n en este enlace", bg="#B4D4FF", font=("Verdana", 12))
+        label_link.pack()
+        enlace_drive = tk.Label(ventana_ayuda, text="Documentación en Google Drive", fg="blue", cursor="hand2", bg="#B4D4FF")
+        enlace_drive.pack(pady=10)
+        enlace_drive.bind("<Button-1>", lambda e: self.abrir_drive())
+
+    def abrir_drive(self):
+        #pendiente colocar el enlace
+        enlace = '[enlace]'
+        os.system(f'start {enlace}') 
 
     def salir(self):
         self.ventana.quit()
