@@ -31,14 +31,3 @@ class ListaMaquetas:
                 siguiente = siguiente.siguiente
             actual = actual.siguiente
 
-    def mostrar_maquetas(self):
-        actual = self.cabeza
-        while actual:
-            print("Nombre:", actual.maqueta.nombre)
-            print("Filas:", actual.maqueta.filas)
-            print("Columnas:", actual.maqueta.columnas)
-            print("Entrada:", actual.maqueta.entrada)
-            print("Objetivos:", actual.maqueta.objetivos)
-            print("Estructura:", actual.maqueta.estructura)
-            print()
-            actual = actual.siguiente

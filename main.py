@@ -138,12 +138,12 @@ class VentanaPrincipal:
         for i in range(R):
             table += "<TR>"
             for j in range(C):
-                if i == entrada_fila and j == entrada_columna:  # Verificar si es la celda de entrada
-                    color = '#ADD8E6'  # Celeste para la celda de entrada
+                if i == entrada_fila and j == entrada_columna:  # Verifica si es la celda de entrada
+                    color = '#ADD8E6'  # Colorear la celda de entrada
                 else:
                     color = '#FFFFFF' if estructura[i * C + j] == '-' else '#000000'
                 table += f'<TD WIDTH="{cell_width}" HEIGHT="{cell_height}" BGCOLOR="{color}" BORDER="0">'
-                # Verificar si hay un objetivo en esta celda
+                # Verifica si hay un objetivo en esta celda
                 objetivo = self.buscar_objetivo(maqueta, i, j)
                 if objetivo:
                     table += objetivo.nombre
@@ -158,8 +158,6 @@ class VentanaPrincipal:
                 return objetivo_actual
             objetivo_actual = objetivo_actual.siguiente
         return None
-
-
 
     def ver_graficamente(self):
         cell_width = 30  # Ancho de celda 
@@ -199,13 +197,12 @@ class VentanaPrincipal:
         # Enlace a Drive
         label_link = tk.Label(ventana_ayuda, text="Puedes consultar la documentación \n en este enlace", bg="#B4D4FF", font=("Verdana", 12))
         label_link.pack()
-        enlace_drive = tk.Label(ventana_ayuda, text="Documentación en Google Drive", fg="blue", cursor="hand2", bg="#B4D4FF")
+        enlace_drive = tk.Label(ventana_ayuda, text="Documentación en Google Drive", fg="blue", cursor="hand2", bg="#B4D4FF", font=("Verdana", 12))
         enlace_drive.pack(pady=10)
         enlace_drive.bind("<Button-1>", lambda e: self.abrir_drive())
 
     def abrir_drive(self):
-        #pendiente colocar el enlace
-        enlace = '[enlace]'
+        enlace = 'https://drive.google.com/file/d/11ZS_AdI3xS7WFQ8Hc6rCJvmotDwh_41S/view?usp=sharing'
         os.system(f'start {enlace}') 
 
     def salir(self):
